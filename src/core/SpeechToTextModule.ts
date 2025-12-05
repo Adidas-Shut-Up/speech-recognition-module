@@ -31,6 +31,7 @@ export class SpeechToTextModule {
       hasPermission: false,
       language: this.config.language!,
       errors: []
+      debug: this.config.debug || false
     };
   }
 
@@ -299,4 +300,5 @@ export class SpeechToTextModule {
   isReady(): boolean {
     return this.isInitialized && this.status.hasPermission;
   }
+
 }

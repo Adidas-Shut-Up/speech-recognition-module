@@ -1,0 +1,194 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Заголовок -->
+    <title>VW | Голосовой модуль распознавания речи</title>
+    
+    <!-- Описание -->
+    <meta name="description" content="Модуль распознавания речи с современным интерфейсом и точной обработкой голосовых команд">
+    <meta name="author" content="Voice Recognition System">
+    
+    <!-- Стили -->
+    <link rel="stylesheet" href="./src/ui/styles/styles.css">
+    
+    <!-- Иконки -->
+    <link rel="icon" href="./src/ui/styles/micro.png" type="image/png">
+    <link rel="apple-touch-icon" href="./src/ui/styles/micro.png">
+</head>
+<body>
+    <!-- Геометрический паттерн фона -->
+    <div class="geometric-pattern"></div>
+    
+    <div class="speech-module-container">
+        <!-- Акцентная полоса -->
+        <div class="container-accent"></div>
+        
+        <!-- Шапка -->
+        <div class="module-header">
+            <div class="header-logo">
+                <img src="./src/ui/styles/gs.png" alt="Логотип" class="site-logo">
+                <h1>VoiceWriter</h1>
+            </div>
+            <p class="module-tagline">
+                Точное распознавание речи с поддержкой нескольких языков и мгновенной обработкой команд
+            </p>
+        </div>
+        
+        <!-- Панель статуса -->
+        <div class="status-panel" id="statusPanel">
+            <div class="status-content">
+                <div class="status-visual">
+                    <div class="status-orb" id="statusOrb"></div>
+                </div>
+                <div class="status-text" id="statusText">Инициализация системы...</div>
+            </div>
+            <div class="status-meta">
+                <span>Версия 1.0 | Профессиональное решение</span>
+            </div>
+        </div>
+        
+        <!-- Основной интерфейс -->
+        <div class="voice-interface">
+            <!-- Левая колонка - управление -->
+            <div class="voice-control-section">
+                <!-- Карточка управления -->
+                <div class="voice-control-card">
+                    <div class="voice-button-wrapper">
+                        <div class="mic-geometry"></div>
+                        <div id="voiceButton">
+                            <!-- Кнопка будет вставлена через JS -->
+                        </div>
+                    </div>
+                    <div class="voice-button-hint">
+                        Нажмите и удерживайте для записи
+                    </div>
+                </div>
+                
+                <!-- Визуализатор -->
+                <div class="voice-visualizer-container">
+                    <div style="text-align: center;">
+                        <canvas id="voiceVisualizer" width="300" height="120"></canvas>
+                    </div>
+                </div>
+                
+                <!-- Настройки -->
+                <div class="settings-panel">
+                    <div class="settings-header" id="settingsToggle">
+                        <div class="settings-title">Параметры распознавания</div>
+                        <div class="settings-toggle" id="settingsArrow"></div>
+                    </div>
+                    <div class="settings-content" id="settingsContent">
+                        <div class="setting-group">
+                            <label class="setting-label">Язык распознавания</label>
+                            <select class="setting-control" id="languageSelect">
+                                <option value="ru-RU" selected>Русский (Россия)</option>
+                                <option value="en-US">English (US)</option>
+                                <option value="en-GB">English (UK)</option>
+                                <option value="de-DE">Deutsch</option>
+                                <option value="fr-FR">Français</option>
+                            </select>
+                        </div>
+                        
+                        <div class="setting-group">
+                            <label class="setting-label">Режим работы</label>
+                            <div class="setting-control">
+                                <label style="display: flex; align-items: center; gap: 8px;">
+                                    <input type="checkbox" id="continuousMode" style="margin: 0;">
+                                    <span>Непрерывный режим</span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="setting-group">
+                            <label class="setting-label">Чувствительность микрофона</label>
+                            <input type="range" class="setting-control sensitivity-slider" id="sensitivitySlider" min="0" max="100" value="50">
+                        </div>
+                        
+                        <div class="setting-group">
+                            <label class="setting-label">Автозапуск</label>
+                            <div class="setting-control">
+                                <label style="display: flex; align-items: center; gap: 8px;">
+                                    <input type="checkbox" id="autoStart" style="margin: 0;">
+                                    <span>Запускать автоматически</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Правая колонка - результаты -->
+            <div class="results-section">
+                <div class="results-card">
+                    <div class="results-header">
+                        <div class="results-title">
+                            <span>Распознанный текст</span>
+                        </div>
+                        <div class="results-actions">
+                            <button class="icon-button" id="clearButton" title="Очистить текст"></button>
+                            <button class="icon-button" id="copyButton" title="Копировать текст"></button>
+                        </div>
+                    </div>
+                    <div class="results-body">
+                        <div class="results-text" id="resultsText" contenteditable="true"></div>
+                    </div>
+                    <div class="results-footer">
+                        <div class="results-stats">
+                            <div class="stat-item">
+                                <span class="stat-icon mic"></span>
+                                <span id="recordingTimer">Запись: 0:00</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-icon chart"></span>
+                                <span id="wordsCount">Слов: 0</span>
+                            </div>
+                        </div>
+                        <div class="results-timestamp">
+                            <span id="lastUpdate">--:--:--</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- История распознавания -->
+                <div class="history-section">
+                    <div class="history-header">
+                        <div class="history-title">
+                            <span>История распознавания</span>
+                        </div>
+                    </div>
+                    <div class="history-list" id="historyList">
+                        <!-- История будет добавляться через JS -->
+                    </div>
+                    <div class="history-empty" id="historyEmpty" style="padding: 20px; text-align: center; color: var(--text-mist); font-style: italic;">
+                        История пока пуста
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Сообщения об ошибках -->
+        <div class="error-message" id="errorContainer" style="display: none;">
+            <div id="errorMessage"></div>
+        </div>
+        
+        <!-- Футер с информацией -->
+        <div class="module-footer">
+            <p class="footer-text">
+                Использует 
+                <span class="tech-badge">Web Speech API</span>
+                и современные веб-технологии
+            </p>
+            <p class="footer-text" style="margin-top: 8px; font-size: 0.75rem;">
+                Совместимо с Chrome, Safari, Edge | Работает в браузере
+            </p>
+        </div>
+    </div>
+    
+    <!-- Подключаем скрипты -->
+    <script type="module" src="/src/main.ts"></script>
+</body>
+</html>

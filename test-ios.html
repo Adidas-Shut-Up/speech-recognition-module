@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тест iOS 26.1 Web Speech API</title>
+    <style>
+        body { font-family: -apple-system, sans-serif; padding: 20px; }
+        .test-result { 
+            padding: 15px; 
+            margin: 10px 0; 
+            border-radius: 10px; 
+            border-left: 5px solid #ccc;
+        }
+        .success { border-color: #4CAF50; background: #e8f5e9; }
+        .error { border-color: #f44336; background: #ffebee; }
+        .warning { border-color: #ff9800; background: #fff3e0; }
+        .info { border-color: #2196F3; background: #e3f2fd; }
+        button { 
+            padding: 12px 24px; 
+            margin: 10px 5px; 
+            font-size: 16px; 
+            border: none; 
+            border-radius: 8px; 
+            cursor: pointer;
+        }
+        .primary-btn { background: #2196F3; color: white; }
+        .secondary-btn { background: #f5f5f5; color: #333; }
+        .danger-btn { background: #f44336; color: white; }
+        code { background: #f5f5f5; padding: 2px 5px; border-radius: 3px; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Тест Web Speech API для iOS 26.1</h1>
+    
+    <div id="results">
+        <div class="test-result info" id="initialStatus">
+            <p>Запуск диагностики...</p>
+        </div>
+    </div>
+    
+    <div style="margin: 20px 0;">
+        <button class="primary-btn" onclick="runFullDiagnostics()">🏃‍♂️ Запустить полную диагностику</button>
+        <button class="secondary-btn" onclick="testMicrophone()">🎤 Тест микрофона</button>
+        <button class="secondary-btn" onclick="testSpeechRecognition()">🎙️ Тест распознавания речи</button>
+        <button class="danger-btn" onclick="resetSafariSettings()">🔄 Сбросить настройки Safari</button>
+    </div>
+    
+    <div id="detailedInfo" style="display: none; margin-top: 30px;">
+        <h3>📊 Подробная информация:</h3>
+        <pre id="debugOutput"></pre>
+    </div>
+    
+    <script>
+        function addResult(message, type = 'info') {
+            const div = document.createElement('div');
+            div.className = `test-result ${type}`;
+            div.innerHTML = `<p>${message}</p>`;
+            document.getElementById('results').appendChild(div);
+            console.log(`${type.toUpperCase()}: ${message}`);
+        }
+        
+        function clearResults() {
+            document.getElementById('results').innerHTML = '';
+        }
+        
+        function getIOSVersion() {
+            const ua = navigator.userAgent;
+            const match = ua.match(/OS (\d+)_(\d+)_?(\d+)?/);
+            return match ? `${match[1]}.${match[2]}.${match[3] || '0'}` : 'Не определена';
+        }
+        
+        function runFullDiagnostics() {
+            clearResults();
+            
+            const iosVersion = getIOSVersion();
+            addResult(`📱 iOS версия: <strong>${iosVersion}</strong>`, 'info');
+            
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+            const isSafari = /Safari/.test(navigator.userAgent) && !/Chrome/.test(navigator.userAgent);
+            const isChrome = /Chrome/.test(navigator.userAgent);
+            
+            addResult(`🍎 iOS устройство: <strong>${isIOS ? '✅ Да' : '❌ Нет'}</strong>`, isIOS ? 'success' : 'error');
+            addResult(`🌐 Браузер Safari: <strong>${isSafari ? '✅ Да' : '❌ Нет'}</strong>`, isSafari ? 'success' : 'error');
+            addResult(`🔵 Браузер Chrome: <strong>${isChrome ? '✅ Да' : '❌ Нет'}</strong>`, 'info');
+            
+            // Проверка Web Speech API
+            addResult('<hr><strong>🎯 Проверка Web Speech API:</strong>', 'info');
+            
+            const hasWebkitSpeechRecognition = 'webkitSpeechRecognition' in window;
+            const hasSpeechRecognition = 'SpeechRecognition' in window;
+            
+            addResult(`<code>webkitSpeechRecognition</code> в window: <strong>${hasWebkitSpeechRecognition ? '✅ ДА' : '❌ НЕТ'}</strong>`, 
+                     hasWebkitSpeechRecognition ? 'success' : 'error');
+            
+            addResult(`<code>SpeechRecognition</code> в window: <strong>${hasSpeechRecognition ? '✅ ДА' : '❌ НЕТ'}</strong>`, 
+                     hasSpeechRecognition ? 'success' : 'warning');
+            
+            // Проверка через window.webkit
+            const hasWebkitObject = typeof window.webkit !== 'undefined';
+            const hasWebkitSpeech = hasWebkitObject && typeof window.webkit.speechRecognition !== 'undefined';
+            
+            addResult(`Объект <code>window.webkit</code>: <strong>${hasWebkitObject ? '✅ Есть' : '❌ Нет'}</strong>`, 
+                     hasWebkitObject ? 'success' : 'warning');
+            
+            addResult(`<code>window.webkit.speechRecognition</code>: <strong>${hasWebkitSpeech ? '✅ ДА' : '❌ НЕТ'}</strong>`, 
+                     hasWebkitSpeech ? 'success' : 'warning');
+            
+            // Проверка микрофона
+            addResult('<hr><strong>🎤 Проверка доступа к микрофону:</strong>', 'info');
+            
+            const hasMediaDevices = !!navigator.mediaDevices;
+            const hasGetUserMedia = hasMediaDevices && !!navigator.mediaDevices.getUserMedia;
+            
+            addResult(`<code>navigator.mediaDevices</code>: <strong>${hasMediaDevices ? '✅ Есть' : '❌ Нет'}</strong>`, 
+                     hasMediaDevices ? 'success' : 'error');
+            
+            addResult(`<code>getUserMedia</code>: <strong>${hasGetUserMedia ? '✅ Доступен' : '❌ Недоступен'}</strong>`, 
+                     hasGetUserMedia ? 'success' : 'error');
+            
+            // Проверка HTTPS
+            const isHTTPS = window.location.protocol === 'https:';
+            addResult(`🔐 HTTPS соединение: <strong>${isHTTPS ? '✅ Да' : '⚠️ Нет (HTTP)'}</strong>`, 
+                     isHTTPS ? 'success' : 'warning');
+            
+            // Итог
+            addResult('<hr><strong>📊 ИТОГ:</strong>', 'info');
+            
+            const webSpeechAvailable = hasWebkitSpeechRecognition || hasSpeechRecognition || hasWebkitSpeech;
+            
+            if (webSpeechAvailable) {
+                addResult('✅ Web Speech API ДОСТУПЕН в вашем браузере', 'success');
+                addResult('Ваше приложение должно работать корректно', 'success');
+                addResult('Проблема может быть в коде инициализации', 'warning');
+            } else {
+                addResult('❌ Web Speech API НЕ ДОСТУПЕН в вашем браузере', 'error');
+                
+                if (isIOS && isSafari) {
+                    addResult('<strong>Возможные причины для iOS 26.1 + Safari:</strong>', 'error');
+                    addResult('1. 🚫 Web Speech API отключен в экспериментальных настройках Safari', 'error');
+                    addResult('2. 🛡️ Блокировщик контента или расширения Safari', 'error');
+                    addResult('3. 🔧 Ошибка в iOS 26.1 (баг версии)', 'error');
+                    addResult('4. 📵 Приватный режим Safari', 'error');
+                }
+            }
+            
+            // Показать детальную информацию
+            document.getElementById('detailedInfo').style.display = 'block';
+            document.getElementById('debugOutput').textContent = JSON.stringify({
+                userAgent: navigator.userAgent,
+                iosVersion: iosVersion,
+                isIOS: isIOS,
+                isSafari: isSafari,
+                webkitSpeechRecognition: hasWebkitSpeechRecognition,
+                speechRecognition: hasSpeechRecognition,
+                windowWebkit: hasWebkitObject,
+                windowWebkitSpeech: hasWebkitSpeech,
+                mediaDevices: hasMediaDevices,
+                getUserMedia: hasGetUserMedia,
+                https: isHTTPS,
+                url: window.location.href,
+                timestamp: new Date().toISOString()
+            }, null, 2);
+        }
+        
+        async function testMicrophone() {
+            addResult('🔍 Тестирую доступ к микрофону...', 'info');
+            
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                addResult('❌ API микрофона не поддерживается браузером', 'error');
+                return;
+            }
+            
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ 
+                    audio: {
+                        echoCancellation: true,
+                        noiseSuppression: true,
+                        autoGainControl: true
+                    }
+                });
+                
+                addResult('✅ Микрофон доступен!', 'success');
+                
+                // Анализируем поток
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const analyser = audioContext.createAnalyser();
+                const source = audioContext.createMediaStreamSource(stream);
+                source.connect(analyser);
+                
+                addResult('🔊 Аудиоконтекст создан успешно', 'success');
+                
+                // Останавливаем всё
+                stream.getTracks().forEach(track => track.stop());
+                audioContext.close();
+                
+                addResult('✅ Тест микрофона пройден успешно', 'success');
+                
+            } catch (error) {
+                addResult(`❌ Ошибка доступа к микрофону: ${error.message}`, 'error');
+                
+                if (error.name === 'NotAllowedError') {
+                    addResult('👆 Пользователь отказал в доступе к микрофону', 'warning');
+                    addResult('Разрешите доступ в диалоге Safari или в Настройки → Safari → Микрофон', 'warning');
+                } else if (error.name === 'NotFoundError') {
+                    addResult('🎤 Микрофон не найден на устройстве', 'error');
+                } else if (error.name === 'NotSupportedError') {
+                    addResult('🌐 Браузер не поддерживает аудио захват', 'error');
+                }
+            }
+        }
+        
+        function testSpeechRecognition() {
+            addResult('🔍 Тестирую распознавание речи...', 'info');
+            
+            // Пробуем все возможные варианты получения API
+            let SpeechRecognition = null;
+            
+            if (typeof window.webkitSpeechRecognition !== 'undefined') {
+                SpeechRecognition = window.webkitSpeechRecognition;
+                addResult('✅ Использую window.webkitSpeechRecognition', 'success');
+            } else if (typeof window.SpeechRecognition !== 'undefined') {
+                SpeechRecognition = window.SpeechRecognition;
+                addResult('✅ Использую window.SpeechRecognition', 'success');
+            } else if (typeof window.webkit !== 'undefined' && typeof window.webkit.speechRecognition !== 'undefined') {
+                SpeechRecognition = window.webkit.speechRecognition;
+                addResult('✅ Использую window.webkit.speechRecognition', 'success');
+            } else {
+                addResult('❌ SpeechRecognition API не найден', 'error');
+                return;
+            }
+            
+            try {
+                const recognition = new SpeechRecognition();
+                addResult('✅ Объект распознавания создан', 'success');
+                
+                recognition.lang = 'ru-RU';
+                recognition.continuous = false;
+                recognition.interimResults = false;
+                recognition.maxAlternatives = 1;
+                
+                recognition.onstart = function() {
+                    addResult('▶️ Распознавание речи начато', 'success');
+                };
+                
+                recognition.onerror = function(event) {
+                    addResult(`❌ Ошибка распознавания: ${event.error}`, 'error');
+                };
+                
+                recognition.onend = function() {
+                    addResult('⏹️ Распознавание речи завершено', 'info');
+                };
+                
+                recognition.onresult = function(event) {
+                    const transcript = event.results[0][0].transcript;
+                    const confidence = event.results[0][0].confidence;
+                    addResult(`📝 Распознано: "${transcript}" (точность: ${confidence.toFixed(2)})`, 'success');
+                };
+                
+                // Запускаем на 3 секунды
+                recognition.start();
+                addResult('🎙️ Говорите сейчас...', 'info');
+                
+                setTimeout(() => {
+                    try {
+                        recognition.stop();
+                        addResult('✅ Тест распознавания завершен', 'success');
+                    } catch (e) {
+                        addResult('⚠️ Не удалось остановить распознавание', 'warning');
+                    }
+                }, 3000);
+                
+            } catch (error) {
+                addResult(`❌ Ошибка создания распознавателя: ${error.message}`, 'error');
+                addResult(`Тип ошибки: ${error.name}`, 'error');
+            }
+        }
+        
+        function resetSafariSettings() {
+            addResult('🔄 Рекомендации по сбросу настроек Safari:', 'warning');
+            addResult('1. 📱 Откройте <strong>Настройки → Safari</strong>', 'info');
+            addResult('2. 🔧 Нажмите <strong>"Дополнения"</strong>', 'info');
+            addResult('3. 🎤 В разделе <strong>"Микрофон"</strong> найдите ваш сайт и выберите "Спрашивать"', 'info');
+            addResult('4. 🧹 Нажмите <strong>"Очистить историю и данные веб-сайтов"</strong>', 'info');
+            addResult('5. 🔄 Перезагрузите эту страницу', 'info');
+            addResult('6. 🔌 Если не помогло, перезагрузите iPhone', 'info');
+        }
+        
+        // Автозапуск при загрузке
+        window.addEventListener('load', function() {
+            setTimeout(runFullDiagnostics, 500);
+        });
+    </script>
+</body>
+</html>

@@ -1060,7 +1060,7 @@ body {
 
 /* iOS-specific styles */
 .ios-welcome {
-  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  background: linear-gradient(135deg, #2A3B5F 0%, #3A4B6F 100%);
   color: white;
   padding: 20px;
   border-radius: 15px;
@@ -1086,12 +1086,12 @@ body {
 }
 
 .ios-welcome strong {
-  color: #ffeb3b;
+  color: #FF7A6C;
 }
 
 #iosTestBtn {
   background: white;
-  color: #4facfe;
+  color: #FF8A7C;
   border: none;
   padding: 12px 24px;
   border-radius: 8px;
@@ -1310,3 +1310,4 @@ body {
   transform: scale(0.95);
   transition: transform 0.1s;
 }
+

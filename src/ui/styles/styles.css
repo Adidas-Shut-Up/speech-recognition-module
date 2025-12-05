@@ -1311,3 +1311,193 @@ body {
   transition: transform 0.1s;
 }
 
+/* Стили для iOS приветственного сообщения */
+.ios-welcome {
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(16px);
+  border-radius: 20px;
+  padding: 24px;
+  margin-bottom: 20px;
+  box-shadow: 0 12px 36px rgba(42, 59, 95, 0.25);
+  border: 1px solid rgba(42, 59, 95, 0.08);
+  position: relative;
+  overflow: hidden;
+}
+
+.ios-welcome::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(145deg, #2A3B5F, #3A4B6F);
+  border-radius: 20px 20px 0 0;
+}
+
+.welcome-content h3 {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #2A3B5F;
+  margin-bottom: 15px;
+}
+
+.welcome-content p {
+  color: #4A526B;
+  line-height: 1.6;
+  margin-bottom: 16px;
+}
+
+.welcome-content ol {
+  padding-left: 20px;
+  margin: 16px 0;
+}
+
+.welcome-content li {
+  margin: 10px 0;
+  color: #4A526B;
+  line-height: 1.5;
+}
+
+.welcome-content strong {
+  color: #FF7A6C;
+}
+
+#iosTestBtn {
+  width: 100%;
+  padding: 14px 24px;
+  background: linear-gradient(145deg, #2A3B5F, #3A4B6F);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  margin-top: 16px;
+}
+
+#iosTestBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(42, 59, 95, 0.3);
+}
+
+/* Карточка для ошибок/повторных попыток */
+.retry-container {
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(16px);
+  border-radius: 20px;
+  padding: 24px;
+  margin-bottom: 20px;
+  box-shadow: 0 12px 36px rgba(42, 59, 95, 0.25);
+  border: 1px solid rgba(42, 59, 95, 0.08);
+  position: relative;
+}
+
+.retry-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(145deg, #FF7A6C, #FF8A7C);
+  border-radius: 20px 20px 0 0;
+}
+
+.retry-content p {
+  color: #2D3246;
+  font-size: 1.1rem;
+  line-height: 1.6;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.retry-button, .debug-button {
+  flex: 1;
+  padding: 12px 20px;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: none;
+}
+
+.retry-button {
+  background: linear-gradient(145deg, #2A3B5F, #3A4B6F);
+  color: white;
+}
+
+.debug-button {
+  background: transparent;
+  color: #4A526B;
+  border: 2px solid #8A92B0;
+}
+
+.retry-button:hover, .debug-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(42, 59, 95, 0.2);
+}
+
+/* Уведомления */
+.notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(16px);
+  border-radius: 12px;
+  padding: 16px 20px;
+  box-shadow: 0 12px 36px rgba(42, 59, 95, 0.25);
+  border: 1px solid rgba(42, 59, 95, 0.08);
+  transform: translateX(120%);
+  animation: slideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  max-width: 320px;
+  z-index: 1000;
+}
+
+.notification.success {
+  border-left: 4px solid #36C9A6;
+}
+
+.notification.error {
+  border-left: 4px solid #D45D42;
+}
+
+.notification-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.notification-icon {
+  width: 20px;
+  height: 20px;
+}
+
+.notification-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #2A3B5F;
+}
+
+.notification-message {
+  font-size: 0.9375rem;
+  color: #4A526B;
+  line-height: 1.5;
+}
+
+/* Контейнер для кнопок действий в retry */
+.retry-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+@media (min-width: 480px) {
+  .retry-content {
+    flex-direction: row;
+  }
+}

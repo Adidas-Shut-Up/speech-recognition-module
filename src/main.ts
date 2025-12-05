@@ -242,7 +242,6 @@ class DemoApplication {
   welcomeDiv.innerHTML = `
     <div class="welcome-content">
       <div class="welcome-header">
-        <img src="./src/ui/styles/micro.png" alt="Микрофон" class="welcome-icon">
         <h3>Голосовой ввод на iOS</h3>
       </div>
       <p>Для использования голосового ввода в Safari:</p>
@@ -692,3 +691,4 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 });
+

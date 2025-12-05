@@ -30,7 +30,7 @@ export class SpeechToTextModule {
       isInitialized: false,
       hasPermission: false,
       language: this.config.language!,
-      errors: []
+      errors: [],
       debug: this.config.debug || false
     };
   }
@@ -302,3 +302,4 @@ export class SpeechToTextModule {
   }
 
 }
+

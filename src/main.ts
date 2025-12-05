@@ -234,41 +234,44 @@ class DemoApplication {
   }
 
   private showIOSWelcomeMessage(): void {
-    const container = document.querySelector('.voice-interface');
-    if (!container) return;
+  const container = document.querySelector('.voice-interface');
+  if (!container) return;
 
-    const welcomeDiv = document.createElement('div');
-    welcomeDiv.className = 'ios-welcome';
-    welcomeDiv.innerHTML = `
-      <div class="welcome-content">
-        <h3>🎤 Голосовой ввод на iOS</h3>
-        <p>Для использования голосового ввода в Safari:</p>
-        <ol>
-          <li><strong>Нажмите и УДЕРЖИВАЙТЕ</strong> кнопку микрофона</li>
-          <li>В появившемся диалоге выберите <strong>"Разрешить"</strong></li>
-          <li>Отпустите кнопку</li>
-          <li>Снова нажмите и удерживайте для записи голоса</li>
-        </ol>
-        <button id="iosTestBtn">Проверить микрофон</button>
+  const welcomeDiv = document.createElement('div');
+  welcomeDiv.className = 'ios-welcome';
+  welcomeDiv.innerHTML = `
+    <div class="welcome-content">
+      <div class="welcome-header">
+        <img src="./src/ui/styles/micro.png" alt="Микрофон" class="welcome-icon">
+        <h3>Голосовой ввод на iOS</h3>
       </div>
-    `;
+      <p>Для использования голосового ввода в Safari:</p>
+      <ol>
+        <li><strong>Нажмите и УДЕРЖИВАЙТЕ</strong> кнопку микрофона</li>
+        <li>В появившемся диалоге выберите <strong>"Разрешить"</strong></li>
+        <li>Отпустите кнопку</li>
+        <li>Снова нажмите и удерживайте для записи голоса</li>
+      </ol>
+      <button id="iosTestBtn">Проверить микрофон</button>
+    </div>
+  `;
 
-    const existingWelcome = document.querySelector('.ios-welcome');
-    if (!existingWelcome) {
-      container.prepend(welcomeDiv);
-    }
-
-    document.getElementById('iosTestBtn')?.addEventListener('click', async () => {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        alert('✅ Микрофон работает! Теперь нажмите и удерживайте кнопку для записи.');
-        stream.getTracks().forEach(track => track.stop());
-        welcomeDiv.remove();
-      } catch (err) {
-        alert('❌ Ошибка доступа к микрофону: ' + (err as Error).message);
-      }
-    });
+  const existingWelcome = document.querySelector('.ios-welcome');
+  if (!existingWelcome) {
+    container.prepend(welcomeDiv);
   }
+
+  document.getElementById('iosTestBtn')?.addEventListener('click', async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      alert('✅ Микрофон работает! Теперь нажмите и удерживайте кнопку для записи.');
+      stream.getTracks().forEach(track => track.stop());
+      welcomeDiv.remove();
+    } catch (err) {
+      alert('❌ Ошибка доступа к микрофону: ' + (err as Error).message);
+    }
+  });
+}
 
   private showRetryButton(): void {
     const container = document.querySelector('.voice-interface');

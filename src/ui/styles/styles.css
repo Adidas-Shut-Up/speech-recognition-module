@@ -8,11 +8,9 @@
   
   --secondary-teal: #1AA894;
   --secondary-teal-light: #2AB8A4;
-  --secondary-teal-dark: #0A9884;
   
   --accent-coral: #FF7A6C;
   --accent-coral-light: #FF8A7C;
-  --accent-coral-dark: #EE6A5C;
   
   --success-mint: #36C9A6;
   --warning-amber: #FFB347;
@@ -27,7 +25,6 @@
   --texture-noise: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.15'/%3E%3C/svg%3E");
   
   --shadow-subtle: 0 4px 12px rgba(42, 59, 95, 0.15);
-  --shadow-medium: 0 8px 24px rgba(42, 59, 95, 0.2);
   --shadow-deep: 0 12px 36px rgba(42, 59, 95, 0.25);
   
   --border-subtle: 1px solid rgba(255, 255, 255, 0.08);
@@ -172,8 +169,6 @@ body {
   display: inline-block;
 }
 
-/* Убраны эмодзи вокруг заголовка */
-
 .module-tagline {
   font-size: 1.125rem;
   color: var(--text-steel);
@@ -281,11 +276,6 @@ body {
   gap: var(--space-sm);
 }
 
-/* Убрана иконка часов */
-.status-meta::before {
-  content: none;
-}
-
 /* Основной голосовой интерфейс */
 .voice-interface {
   display: grid;
@@ -314,7 +304,7 @@ body {
 
 .voice-control-card:hover {
   transform: translateY(-2px);
-  box-shadow: var(--shadow-medium);
+  box-shadow: var(--shadow-deep);
 }
 
 /* Кнопка микрофона - авторский дизайн */
@@ -364,6 +354,8 @@ body {
   box-shadow: 
     0 8px 24px rgba(42, 59, 95, 0.2),
     inset 0 2px 4px rgba(255, 255, 255, 0.3);
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
 }
 
 .voice-button:hover:not(:disabled) {
@@ -395,15 +387,16 @@ body {
   }
 }
 
+.voice-button.pressing {
+  transform: scale(0.95);
+  transition: transform 0.1s;
+}
+
 .voice-button-icon {
   position: relative;
   z-index: 2;
   width: 36px;
   height: 36px;
-  background: var(--icon-mic) center/contain no-repeat;
-}
-
-.voice-button.active .voice-button-icon {
   background: var(--icon-mic) center/contain no-repeat;
 }
 
@@ -849,19 +842,20 @@ body {
   position: fixed;
   top: 20px;
   right: 20px;
-  background: white;
-  border-radius: var(--radius-md);
-  padding: var(--space-md) var(--space-lg);
-  box-shadow: var(--shadow-medium);
-  border-left: 4px solid var(--secondary-teal);
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(16px);
+  border-radius: 12px;
+  padding: 16px 20px;
+  box-shadow: var(--shadow-deep);
+  border: 1px solid rgba(42, 59, 95, 0.08);
   transform: translateX(120%);
-  animation: slideIn 0.3s ease forwards;
+  animation: slideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
   max-width: 320px;
   z-index: 1000;
 }
 
 .notification.success {
-  border-left-color: var(--success-mint);
+  border-left: 4px solid var(--success-mint);
 }
 
 .notification.success .notification-icon {
@@ -869,7 +863,7 @@ body {
 }
 
 .notification.error {
-  border-left-color: var(--error-rust);
+  border-left: 4px solid var(--error-rust);
 }
 
 .notification.error .notification-icon {
@@ -885,8 +879,8 @@ body {
 .notification-header {
   display: flex;
   align-items: center;
-  gap: var(--space-sm);
-  margin-bottom: var(--space-sm);
+  gap: 12px;
+  margin-bottom: 8px;
 }
 
 .notification-icon {
@@ -1012,250 +1006,133 @@ body {
   background: var(--secondary-teal-light);
 }
 
-/* Эффект печатания для текста */
-.typewriter {
+/* iOS-specific styles */
+.ios-welcome {
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(16px);
+  border-radius: 20px;
+  padding: 24px;
+  margin-bottom: 20px;
+  box-shadow: var(--shadow-deep);
+  border: var(--border-subtle);
+  position: relative;
   overflow: hidden;
-  border-right: 2px solid var(--secondary-teal);
-  white-space: nowrap;
-  animation: typing 3.5s steps(40, end), blink-caret 0.75s step-end infinite;
 }
 
-@keyframes typing {
-  from { width: 0 }
-  to { width: 100% }
-}
-
-@keyframes blink-caret {
-  from, to { border-color: transparent }
-  50% { border-color: var(--secondary-teal) }
-}
-
-/* Минималистичные анимации загрузки */
-.loading-dots {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.loading-dots span {
-  width: 4px;
+.ios-welcome::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
   height: 4px;
-  background: var(--secondary-teal);
-  border-radius: 50%;
-  animation: dotsPulse 1.4s ease-in-out infinite;
+  background: var(--gradient-primary);
+  border-radius: 20px 20px 0 0;
 }
 
-.loading-dots span:nth-child(2) {
-  animation-delay: 0.2s;
-}
-
-.loading-dots span:nth-child(3) {
-  animation-delay: 0.4s;
-}
-
-@keyframes dotsPulse {
-  0%, 100% { transform: scale(1); opacity: 1; }
-  50% { transform: scale(0.5); opacity: 0.5; }
-}
-
-/* iOS-specific styles */
-.ios-welcome {
-  background: linear-gradient(135deg, #2A3B5F 0%, #3A4B6F 100%);
-  color: white;
-  padding: 20px;
-  border-radius: 15px;
-  margin-bottom: 20px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-}
-
-.ios-welcome h3 {
-  margin-top: 0;
+.welcome-content h3 {
   font-size: 1.4rem;
+  font-weight: 600;
+  color: var(--primary-deep);
   margin-bottom: 15px;
 }
 
-.ios-welcome ol {
-  text-align: left;
+.welcome-content p {
+  color: var(--text-steel);
+  line-height: 1.6;
+  margin-bottom: 16px;
+}
+
+.welcome-content ol {
   padding-left: 20px;
-  margin: 15px 0;
+  margin: 16px 0;
 }
 
-.ios-welcome li {
+.welcome-content li {
   margin: 10px 0;
-  font-size: 1rem;
+  color: var(--text-steel);
+  line-height: 1.5;
 }
 
-.ios-welcome strong {
-  color: #FF7A6C;
+.welcome-content strong {
+  color: var(--accent-coral);
 }
 
 #iosTestBtn {
-  background: white;
-  color: #FF8A7C;
-  border: none;
-  padding: 12px 24px;
-  border-radius: 8px;
-  font-weight: bold;
-  cursor: pointer;
-  margin-top: 15px;
   width: 100%;
+  padding: 14px 24px;
+  background: var(--gradient-primary);
+  color: white;
+  border: none;
+  border-radius: var(--radius-md);
+  font-weight: 600;
   font-size: 1rem;
-  transition: all 0.3s;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  margin-top: 16px;
 }
 
 #iosTestBtn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 8px 24px rgba(42, 59, 95, 0.3);
 }
 
-.ios-instruction {
-  background: rgba(255, 193, 7, 0.1);
-  border-left: 4px solid #ffc107;
-  padding: 12px 16px;
-  margin-top: 15px;
-  border-radius: 0 8px 8px 0;
-}
-
-.ios-instruction p {
-  margin: 5px 0;
-  font-size: 0.9rem;
-  color: #ff9800;
-}
-
-@keyframes pulse-gold {
-  0% { box-shadow: 0 0 0 0 rgba(255, 193, 7, 0.4); }
-  70% { box-shadow: 0 0 0 10px rgba(255, 193, 7, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(255, 193, 7, 0); }
-}
-
-.status-panel.ready.ios-pending {
-  background: linear-gradient(135deg, #fff9c4 0%, #fff59d 100%);
-  color: #5d4037;
-}
-
-.status-panel.ready.ios-pending .status-orb {
-  background: #ffc107;
-  animation: pulse-gold 2s infinite;
-}
-
-@media (max-width: 768px) {
-  .ios-welcome {
-    padding: 15px;
-    margin: 10px;
-  }
-  
-  .ios-welcome h3 {
-    font-size: 1.2rem;
-  }
-  
-  .ios-welcome ol {
-    font-size: 0.9rem;
-  }
-}
-
-.voice-button {
-  -webkit-tap-highlight-color: transparent;
-  touch-action: manipulation;
-}
-
-.voice-button.pressing {
-  transform: scale(0.95);
-  transition: transform 0.1s;
-}
-
-/* iOS-specific styles */
-.ios-welcome {
-  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-  color: white;
-  padding: 20px;
-  border-radius: 15px;
-  margin-bottom: 20px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-}
-
-.ios-welcome h3 {
-  margin-top: 0;
-  font-size: 1.4rem;
-  margin-bottom: 15px;
-}
-
-.ios-welcome ol {
-  text-align: left;
-  padding-left: 20px;
-  margin: 15px 0;
-}
-
-.ios-welcome li {
-  margin: 10px 0;
-  font-size: 1rem;
-}
-
-.ios-welcome strong {
-  color: #ffeb3b;
-}
-
-#iosTestBtn {
-  background: white;
-  color: #4facfe;
-  border: none;
-  padding: 12px 24px;
-  border-radius: 8px;
-  font-weight: bold;
-  cursor: pointer;
-  margin-top: 15px;
-  width: 100%;
-  font-size: 1rem;
-  transition: all 0.3s;
-}
-
-#iosTestBtn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-}
-
+/* Карточка для ошибок/повторных попыток */
 .retry-container {
-  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
-  color: white;
-  padding: 20px;
-  border-radius: 15px;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(16px);
+  border-radius: 20px;
+  padding: 24px;
   margin-bottom: 20px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-  text-align: center;
+  box-shadow: var(--shadow-deep);
+  border: var(--border-subtle);
+  position: relative;
+}
+
+.retry-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--gradient-accent);
+  border-radius: 20px 20px 0 0;
 }
 
 .retry-content p {
-  margin-bottom: 20px;
+  color: var(--text-slate);
   font-size: 1.1rem;
+  line-height: 1.6;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.retry-button, .debug-button {
+  flex: 1;
+  padding: 12px 20px;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: none;
 }
 
 .retry-button {
-  background: white;
-  color: #ff6b6b;
-  border: none;
-  padding: 12px 24px;
-  border-radius: 8px;
-  font-weight: bold;
-  cursor: pointer;
-  margin: 5px;
-  font-size: 1rem;
-  transition: all 0.3s;
+  background: var(--gradient-primary);
+  color: white;
 }
 
 .debug-button {
   background: transparent;
-  color: white;
-  border: 2px solid white;
-  padding: 10px 20px;
-  border-radius: 8px;
-  cursor: pointer;
-  margin: 5px;
-  font-size: 0.9rem;
-  transition: all 0.3s;
+  color: var(--text-steel);
+  border: 2px solid var(--text-mist);
 }
 
 .retry-button:hover, .debug-button:hover {
   transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 6px 20px rgba(42, 59, 95, 0.2);
 }
 
 .status-panel.error {
@@ -1301,195 +1178,6 @@ body {
   }
 }
 
-.voice-button {
-  -webkit-tap-highlight-color: transparent;
-  touch-action: manipulation;
-}
-
-.voice-button.pressing {
-  transform: scale(0.95);
-  transition: transform 0.1s;
-}
-
-/* Стили для iOS приветственного сообщения */
-.ios-welcome {
-  background: rgba(255, 255, 255, 0.92);
-  backdrop-filter: blur(16px);
-  border-radius: 20px;
-  padding: 24px;
-  margin-bottom: 20px;
-  box-shadow: 0 12px 36px rgba(42, 59, 95, 0.25);
-  border: 1px solid rgba(42, 59, 95, 0.08);
-  position: relative;
-  overflow: hidden;
-}
-
-.ios-welcome::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background: linear-gradient(145deg, #2A3B5F, #3A4B6F);
-  border-radius: 20px 20px 0 0;
-}
-
-.welcome-content h3 {
-  font-size: 1.4rem;
-  font-weight: 600;
-  color: #2A3B5F;
-  margin-bottom: 15px;
-}
-
-.welcome-content p {
-  color: #4A526B;
-  line-height: 1.6;
-  margin-bottom: 16px;
-}
-
-.welcome-content ol {
-  padding-left: 20px;
-  margin: 16px 0;
-}
-
-.welcome-content li {
-  margin: 10px 0;
-  color: #4A526B;
-  line-height: 1.5;
-}
-
-.welcome-content strong {
-  color: #FF7A6C;
-}
-
-#iosTestBtn {
-  width: 100%;
-  padding: 14px 24px;
-  background: linear-gradient(145deg, #2A3B5F, #3A4B6F);
-  color: white;
-  border: none;
-  border-radius: 12px;
-  font-weight: 600;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  margin-top: 16px;
-}
-
-#iosTestBtn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(42, 59, 95, 0.3);
-}
-
-/* Карточка для ошибок/повторных попыток */
-.retry-container {
-  background: rgba(255, 255, 255, 0.92);
-  backdrop-filter: blur(16px);
-  border-radius: 20px;
-  padding: 24px;
-  margin-bottom: 20px;
-  box-shadow: 0 12px 36px rgba(42, 59, 95, 0.25);
-  border: 1px solid rgba(42, 59, 95, 0.08);
-  position: relative;
-}
-
-.retry-container::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background: linear-gradient(145deg, #FF7A6C, #FF8A7C);
-  border-radius: 20px 20px 0 0;
-}
-
-.retry-content p {
-  color: #2D3246;
-  font-size: 1.1rem;
-  line-height: 1.6;
-  margin-bottom: 20px;
-  text-align: center;
-}
-
-.retry-button, .debug-button {
-  flex: 1;
-  padding: 12px 20px;
-  border-radius: 10px;
-  font-weight: 600;
-  font-size: 0.95rem;
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  border: none;
-}
-
-.retry-button {
-  background: linear-gradient(145deg, #2A3B5F, #3A4B6F);
-  color: white;
-}
-
-.debug-button {
-  background: transparent;
-  color: #4A526B;
-  border: 2px solid #8A92B0;
-}
-
-.retry-button:hover, .debug-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(42, 59, 95, 0.2);
-}
-
-/* Уведомления */
-.notification {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(16px);
-  border-radius: 12px;
-  padding: 16px 20px;
-  box-shadow: 0 12px 36px rgba(42, 59, 95, 0.25);
-  border: 1px solid rgba(42, 59, 95, 0.08);
-  transform: translateX(120%);
-  animation: slideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-  max-width: 320px;
-  z-index: 1000;
-}
-
-.notification.success {
-  border-left: 4px solid #36C9A6;
-}
-
-.notification.error {
-  border-left: 4px solid #D45D42;
-}
-
-.notification-header {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 8px;
-}
-
-.notification-icon {
-  width: 20px;
-  height: 20px;
-}
-
-.notification-title {
-  font-size: 1rem;
-  font-weight: 600;
-  color: #2A3B5F;
-}
-
-.notification-message {
-  font-size: 0.9375rem;
-  color: #4A526B;
-  line-height: 1.5;
-}
-
-/* Контейнер для кнопок действий в retry */
 .retry-content {
   display: flex;
   flex-direction: column;

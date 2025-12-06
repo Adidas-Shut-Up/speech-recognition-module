@@ -240,7 +240,7 @@ class DemoApplication {
   const welcomeDiv = document.createElement('div');
   welcomeDiv.className = 'ios-welcome';
   welcomeDiv.innerHTML = `
-    <div class="welcome-content">
+      <div class="welcome-content">
       <div class="welcome-header">
         <h3>Голосовой ввод на iOS</h3>
       </div>
@@ -691,4 +691,3 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 });
-

@@ -85,6 +85,8 @@ class DemoApplication {
   private recognitionHistory: Array<{ text: string, timestamp: number, wordCount: number }> = [];
   private volumeCheckInterval: number | null = null;
   private shouldAutoStart: boolean;
+  private hasUserGrantedPermission = false;
+  private isFirstSafariInteraction = false; // Новый флаг для Safari
 
   constructor() {
     console.log('=== ИНИЦИАЛИЗАЦИЯ ПРИЛОЖЕНИЯ ===');
@@ -131,6 +133,9 @@ class DemoApplication {
       localStorage.setItem('voiceModule_continuousMode', isContinuous.toString());
       this.showNotification(`Режим: ${isContinuous ? 'непрерывный' : 'по фразам'}`);
     });
+
+    // Определяем, Safari ли это при первой загрузке
+    this.isFirstSafariInteraction = (PlatformAdapter.isIOS() || PlatformAdapter.isSafari());
 
     this.setupEventListeners();
     this.initializeModule();
@@ -188,15 +193,22 @@ class DemoApplication {
       
       console.log('✅ Модуль успешно инициализирован');
       
+      // ИСПРАВЛЕННЫЙ АВТОЗАПУСК: только для не-Safari браузеров
       if (this.shouldAutoStart) {
-      if (PlatformAdapter.isIOS()) {
-        console.log('iOS: автозапуск отложен до ручного разрешения микрофона');
-      } else {
-        setTimeout(() => {
-          this.handleVoiceButtonClick();
-        }, 2000);
+        if (PlatformAdapter.isIOS() || PlatformAdapter.isSafari()) {
+          console.log('Safari/iOS: автозапуск отложен до ручного разрешения микрофона');
+          this.showNotification('Нажмите кнопку микрофона для первого запуска', 'success');
+        } else {
+          // Для Chrome, Firefox и других браузеров
+          setTimeout(() => {
+            const continuousMode = document.getElementById('continuousMode') as HTMLInputElement;
+            const isContinuous = continuousMode.checked;
+            this.speechModule.setContinuous(isContinuous);
+            console.log(`Автозапуск: начата запись (режим: ${isContinuous ? 'непрерывный' : 'по фразам'})`);
+            this.handleVoiceButtonClick();
+          }, 2000);
+        }
       }
-    }
       
     } catch (error) {
       console.error('❌ ОШИБКА ИНИЦИАЛИЗАЦИИ МОДУЛЯ:', error);
@@ -234,43 +246,44 @@ class DemoApplication {
   }
 
   private showIOSWelcomeMessage(): void {
-  const container = document.querySelector('.voice-interface');
-  if (!container) return;
+    const container = document.querySelector('.voice-interface');
+    if (!container) return;
 
-  const welcomeDiv = document.createElement('div');
-  welcomeDiv.className = 'ios-welcome';
-  welcomeDiv.innerHTML = `
+    const welcomeDiv = document.createElement('div');
+    welcomeDiv.className = 'ios-welcome';
+    welcomeDiv.innerHTML = `
       <div class="welcome-content">
-      <div class="welcome-header">
-        <h3>Голосовой ввод на iOS</h3>
+        <div class="welcome-header">
+          <h3>Голосовой ввод на iOS</h3>
+        </div>
+        <p>Для использования голосового ввода в Safari:</p>
+        <ol>
+          <li><strong>Нажмите и УДЕРЖИВАЙТЕ</strong> кнопку микрофона</li>
+          <li>В появившемся диалоге выберите <strong>"Разрешить"</strong></li>
+          <li>Отпустите кнопку</li>
+          <li>Снова нажмите и удерживайте для записи голоса</li>
+        </ol>
+        <button id="iosTestBtn">Проверить микрофон</button>
       </div>
-      <p>Для использования голосового ввода в Safari:</p>
-      <ol>
-        <li><strong>Нажмите и УДЕРЖИВАЙТЕ</strong> кнопку микрофона</li>
-        <li>В появившемся диалоге выберите <strong>"Разрешить"</strong></li>
-        <li>Отпустите кнопку</li>
-        <li>Снова нажмите и удерживайте для записи голоса</li>
-      </ol>
-      <button id="iosTestBtn">Проверить микрофон</button>
-    </div>
-  `;
+    `;
 
-  const existingWelcome = document.querySelector('.ios-welcome');
-  if (!existingWelcome) {
-    container.prepend(welcomeDiv);
-  }
-
-  document.getElementById('iosTestBtn')?.addEventListener('click', async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      alert('✅ Микрофон работает! Теперь нажмите и удерживайте кнопку для записи.');
-      stream.getTracks().forEach(track => track.stop());
-      welcomeDiv.remove();
-    } catch (err) {
-      alert('❌ Ошибка доступа к микрофону: ' + (err as Error).message);
+    const existingWelcome = document.querySelector('.ios-welcome');
+    if (!existingWelcome) {
+      container.prepend(welcomeDiv);
     }
-  });
-}
+
+    document.getElementById('iosTestBtn')?.addEventListener('click', async () => {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        alert('✅ Микрофон работает! Теперь нажмите и удерживайте кнопку для записи.');
+        stream.getTracks().forEach(track => track.stop());
+        welcomeDiv.remove();
+        this.hasUserGrantedPermission = true;
+      } catch (err) {
+        alert('❌ Ошибка доступа к микрофону: ' + (err as Error).message);
+      }
+    });
+  }
 
   private showRetryButton(): void {
     const container = document.querySelector('.voice-interface');
@@ -322,6 +335,12 @@ class DemoApplication {
 
     this.speechModule.onStatusChange((status: ModuleStatus) => {
       console.log('Статус изменился:', status);
+      
+      // Обновляем флаг разрешения
+      if (status.hasPermission) {
+        this.hasUserGrantedPermission = true;
+        this.isFirstSafariInteraction = false;
+      }
       
       this.updateStatus(
         status.isListening ? 'Слушаю...' :
@@ -385,22 +404,46 @@ class DemoApplication {
     try {
       const currentStatus = this.speechModule.getStatus();
       
+      // ОСНОВНОЕ ИСПРАВЛЕНИЕ: специальная логика для первого запуска в Safari
+      if (this.isFirstSafariInteraction && !currentStatus.hasPermission) {
+        console.log('Safari/iOS: первый запуск - запрашиваем микрофон');
+        this.updateStatus('Запрос доступа к микрофону...', 'listening');
+        
+        // Явно запрашиваем доступ через модуль
+        const permissionGranted = await this.speechModule.requestMicrophoneAccess();
+        
+        if (permissionGranted) {
+          this.hasUserGrantedPermission = true;
+          this.isFirstSafariInteraction = false;
+          this.showNotification('Доступ к микрофону получен', 'success');
+          
+          // Если автозапуск был включен - запускаем после получения разрешения
+          if (this.shouldAutoStart) {
+            console.log('Safari/iOS: автозапуск активирован после получения разрешения');
+            await this.speechModule.startListening();
+            this.recordingTimer.start();
+            this.voiceButton.setActive(true);
+            return;
+          }
+        } else {
+          this.showError('Не удалось получить доступ к микрофону');
+          return;
+        }
+      }
+      
+      // ОБЫЧНАЯ ЛОГИКА ЗАПУСКА/ОСТАНОВКИ
       if (currentStatus.isListening) {
         this.speechModule.stopListening();
         this.recordingTimer.stop();
         this.voiceButton.setActive(false);
         console.log('Остановлена запись');
       } else {
-        if (PlatformAdapter.isIOS() && !currentStatus.hasPermission) {
-          console.log('iOS: первый запуск - запрашиваем микрофон');
-          this.updateStatus('Запрос доступа к микрофону...', 'listening');
-        }
-        
         await this.speechModule.startListening();
         this.recordingTimer.start();
         this.voiceButton.setActive(true);
         console.log('Начата запись');
       }
+      
     } catch (error) {
       console.error('Voice button error:', error);
       this.showError('Не удалось начать запись');

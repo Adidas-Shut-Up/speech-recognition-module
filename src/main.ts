@@ -188,15 +188,15 @@ class DemoApplication {
       
       console.log('✅ Модуль успешно инициализирован');
       
-      if (this.shouldAutoStart && !PlatformAdapter.isIOS()) {
+      if (this.shouldAutoStart) {
+      if (PlatformAdapter.isIOS()) {
+        console.log('iOS: автозапуск отложен до ручного разрешения микрофона');
+      } else {
         setTimeout(() => {
-          const continuousMode = document.getElementById('continuousMode') as HTMLInputElement;
-          const isContinuous = continuousMode.checked;
-          this.speechModule.setContinuous(isContinuous);
-          console.log(`Автозапуск: начата запись (режим: ${isContinuous ? 'непрерывный' : 'по фразам'})`);
           this.handleVoiceButtonClick();
         }, 2000);
       }
+    }
       
     } catch (error) {
       console.error('❌ ОШИБКА ИНИЦИАЛИЗАЦИИ МОДУЛЯ:', error);

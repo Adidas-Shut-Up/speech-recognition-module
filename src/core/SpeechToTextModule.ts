@@ -300,6 +300,4 @@ export class SpeechToTextModule {
   isReady(): boolean {
     return this.isInitialized && this.status.hasPermission;
   }
-
 }
-
